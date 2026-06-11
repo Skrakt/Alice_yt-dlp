@@ -1,91 +1,160 @@
-# PRH: Personal Rabbit Hole
+# Alice
 
-PRH est une application desktop locale construite avec Tauri v2, React, TypeScript et Rust pour analyser et télécharger des médias YouTube via `yt-dlp`, puis les convertir avec `FFmpeg`.
+Alice est une application desktop locale construite avec Tauri v2, React, TypeScript et Rust.
 
-## MVP inclus
+Elle sert à la fois de :
+- téléchargeur YouTube basé sur `yt-dlp`
+- navigateur de médias locaux avec dossiers favoris persistants
 
-- champ URL et analyse locale via `yt-dlp --flat-playlist --dump-json`
-- support vidéo unique, playlist, et chaîne si `yt-dlp` le gère
-- sélection individuelle des médias détectés
-- téléchargement audio ou vidéo
-- formats audio `mp3`, `m4a`, `flac`, `opus`, `wav`
-- formats vidéo `mp4`, `mkv`, `webm`
-- qualité vidéo `best`, `1080p`, `720p`
-- sélection du dossier de sortie
-- progression globale et logs visibles
-- annulation
-- historique local en JSON
+## Ce que permet l'application
+
+- analyser une URL YouTube avec `yt-dlp --flat-playlist --dump-json`
+- afficher les médias détectés avant téléchargement
+- sélectionner les éléments à télécharger
+- télécharger en audio ou vidéo
+- choisir le format de sortie
+- choisir ou saisir manuellement le dossier de destination
+- suivre la progression et les logs
+- annuler une analyse ou un téléchargement
+- consulter un historique local
+- parcourir des dossiers locaux favoris depuis une barre latérale repliable
+
+## Interface actuelle
+
+- barre latérale gauche repliable, dans l'esprit ChatGPT / Claude desktop
+- vue `Accueil` pour le téléchargement
+- vue `Bibliothèque locale` pour naviguer dans les dossiers favoris
+- favoris persistés côté Tauri dans le dossier de données de l'application
+- historique visible dans la barre latérale
 
 ## Stack
 
 - Tauri v2
-- React
+- React 19
 - TypeScript
 - Vite
 - Rust
 - `yt-dlp`
-- `FFmpeg`
+- `ffmpeg`
 
 ## Pré-requis
 
-Installe les outils suivants avant de lancer l’application :
+### Obligatoires
 
 1. Node.js 20+ ou 22+
 2. Rust toolchain avec `cargo` et `rustc`
-3. Tauri prerequisites pour macOS
-4. `yt-dlp` disponible dans le `PATH`
-5. `ffmpeg` disponible dans le `PATH`
+3. Prérequis Tauri pour macOS
 
-Exemple macOS avec Homebrew :
+### Dépendances médias
+
+Alice vérifie `yt-dlp` et `ffmpeg` au lancement.
+
+Si elles manquent, l'application tente de les installer automatiquement via Homebrew.
+
+Installation manuelle possible :
 
 ```bash
-brew install rust yt-dlp ffmpeg
+brew install yt-dlp ffmpeg
+```
+
+## Installation
+
+```bash
 npm install
+```
+
+## Lancer en développement
+
+```bash
 npm run tauri dev
 ```
 
-## Scripts
+Comportement attendu :
+- modification frontend : hot reload
+- modification Rust / Tauri : recompilation puis relance de l'app
+
+## Build
 
 ```bash
-npm install
+npm run build
+```
+
+## Scripts utiles
+
+```bash
 npm run dev
 npm run build
+npm run preview
 npm run tauri dev
 ```
 
-## Structure
+## Structure du projet
 
 ```text
 src/
   App.tsx
-  main.tsx
   components/
   lib/
 
 src-tauri/
+  icons/
   src/
-    main.rs
     commands.rs
-    ytdlp.rs
-    models.rs
+    folders.rs
     history.rs
-  capabilities/
-    default.json
+    main.rs
+    models.rs
+    ytdlp.rs
+  tauri.conf.json
 ```
 
-## Notes d’implémentation
+## Nommage des fichiers téléchargés
 
-- L’analyse se fait sans API YouTube, uniquement via `yt-dlp`.
-- Les téléchargements sont déclenchés dans le backend Rust pour ne pas bloquer l’interface.
-- Les logs et la progression sont poussés au frontend via des événements Tauri.
-- L’historique est stocké en local dans le dossier applicatif Tauri sous forme de JSON.
-- Le template de nommage par défaut est `%(playlist_index)03d - %(title)s.%(ext)s`.
+L'interface propose des modèles simples :
+- `Numéro + titre`
+- `Titre seul`
+- `Auteur + titre`
+- `Date + titre`
 
-## Limites actuelles
+Le modèle par défaut est :
 
-- La progression par média dépend du format exact des logs `yt-dlp` et reste volontairement robuste plutôt que sur-optimisée.
-- Le projet n’a pas pu être exécuté dans cet environnement car `cargo`, `rustc` et `yt-dlp` ne sont pas installés sur la machine au moment de l’implémentation.
+```text
+%(playlist_index)03d - %(title)s.%(ext)s
+```
 
-## Message légal
+## Données locales
+
+Alice est pensée pour une distribution publique sur GitHub avec persistance 100 % locale.
+
+Alice stocke localement :
+- l'historique des téléchargements
+- les dossiers favoris
+- certains paramètres d'interface, comme l'état ouvert / fermé de la barre latérale
+
+Ces données sont enregistrées dans le dossier applicatif Tauri.
+
+Aucune donnée utilisateur n'est synchronisée vers un serveur distant par l'application.
+
+## Icône de l'application
+
+L'icône utilisée par Tauri est :
+
+```text
+src-tauri/icons/icon.png
+```
+
+Elle est actuellement générée à partir du fichier racine :
+
+```text
+ChatGPT Image Jun 11, 2026, 04_04_35 PM.png
+```
+
+## Limites connues
+
+- la progression détaillée dépend du format des logs émis par `yt-dlp`
+- l'installation automatique des dépendances suppose un environnement Homebrew
+- le navigateur local est centré sur l'exploration, pas encore sur la lecture intégrée des médias
+
+## Légal
 
 Télécharge uniquement les contenus que tu as le droit de télécharger.
