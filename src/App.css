@@ -146,6 +146,7 @@ button:disabled {
 
 .panel-header {
   justify-content: space-between;
+  margin-bottom: 18px;
 }
 
 .segmented-control {
@@ -180,7 +181,7 @@ button:disabled {
 }
 
 .template-selector {
-  margin-top: 18px;
+  margin-top: 0;
 }
 
 .template-selector-header small,
@@ -272,6 +273,21 @@ button:disabled {
 .sidebar-compact-actions {
   display: grid;
   gap: 12px;
+}
+
+.sidebar-header,
+.sidebar-history-section,
+.log-panel,
+.progress-shell,
+.field-grid,
+.segmented-control,
+.output-row,
+.controls-row,
+.media-list,
+.history-list,
+.local-entry-list,
+.template-selector {
+  margin-top: 8px;
 }
 
 .sidebar-topbar {

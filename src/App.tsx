@@ -71,7 +71,6 @@ function App() {
   const [videoFormat, setVideoFormat] = useState<VideoFormat>("mp4");
   const [videoQuality, setVideoQuality] = useState<VideoQuality>("best");
   const [outputDir, setOutputDir] = useState("");
-  const [audioQuality, setAudioQuality] = useState("0");
   const [outputTemplate, setOutputTemplate] = useState(DEFAULT_TEMPLATE);
   const [totalProgress, setTotalProgress] = useState(0);
   const [statusText, setStatusText] = useState("Prêt.");
@@ -333,7 +332,7 @@ function App() {
           video_format: mode === "video" ? videoFormat : null,
           video_quality: mode === "video" ? videoQuality : null,
           output_dir: outputDir,
-          audio_quality: audioQuality,
+          audio_quality: "0",
           embed_thumbnail: true,
           add_metadata: true,
           output_template: outputTemplate,
@@ -443,9 +442,7 @@ function App() {
                   />
 
                   <DownloadOptions
-                    audioQuality={audioQuality}
                     outputTemplate={outputTemplate}
-                    onAudioQualityChange={setAudioQuality}
                     onOutputTemplateChange={setOutputTemplate}
                   />
 

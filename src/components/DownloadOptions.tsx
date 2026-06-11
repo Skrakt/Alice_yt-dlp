@@ -22,16 +22,12 @@ const TEMPLATE_OPTIONS = [
 ] as const;
 
 interface DownloadOptionsProps {
-  audioQuality: string;
   outputTemplate: string;
-  onAudioQualityChange: (value: string) => void;
   onOutputTemplateChange: (value: string) => void;
 }
 
 export function DownloadOptions({
-  audioQuality,
   outputTemplate,
-  onAudioQualityChange,
   onOutputTemplateChange,
 }: DownloadOptionsProps) {
   const selectedTemplate =
@@ -42,18 +38,6 @@ export function DownloadOptions({
     <section className="panel">
       <div className="panel-header">
         <h2>Options</h2>
-      </div>
-
-      <div className="field-grid">
-        <label>
-          <span>Qualité audio</span>
-          <select
-            value={audioQuality}
-            onChange={(event) => onAudioQualityChange(event.target.value)}
-          >
-            <option value="0">Qualité maximale</option>
-          </select>
-        </label>
       </div>
 
       <div className="template-selector">
