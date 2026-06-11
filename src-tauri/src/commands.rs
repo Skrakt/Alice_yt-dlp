@@ -1,7 +1,8 @@
 use crate::{
     folders,
     history,
-    models::{DownloadRequest, HistoryEntry, LocalMediaEntry, SavedFolder},
+    models::{AppSettings, DownloadRequest, HistoryEntry, LocalMediaEntry, SavedFolder},
+    settings,
     ytdlp,
     AnalysisState, DownloadState,
 };
@@ -194,4 +195,14 @@ pub fn get_saved_folders(app: AppHandle) -> Result<Vec<SavedFolder>, String> {
 #[tauri::command]
 pub fn save_saved_folders(app: AppHandle, folders: Vec<SavedFolder>) -> Result<(), String> {
     folders::save_saved_folders(&app, &folders)
+}
+
+#[tauri::command]
+pub fn get_settings(app: AppHandle) -> Result<AppSettings, String> {
+    settings::load_settings(&app)
+}
+
+#[tauri::command]
+pub fn save_settings(app: AppHandle, settings: AppSettings) -> Result<(), String> {
+    settings::save_settings(&app, &settings)
 }

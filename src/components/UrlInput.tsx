@@ -21,10 +21,10 @@ export function UrlInput({
     <section className="panel hero-panel">
       <div>
         <p className="eyebrow">Alice</p>
-        <h1>Download. Browse. Organize.</h1>
+        <h1>Télécharge. Explore. Organise.</h1>
         <p className="hero-copy">
-          Colle une URL YouTube, analyse son contenu, puis télécharge en audio
-          ou vidéo sans ligne de commande.
+          Colle une URL de Playlist ou Vidéo YouTube, analyse son contenu, puis
+          télécharge en audio ou vidéo avec simplicité.
         </p>
       </div>
 
@@ -49,7 +49,7 @@ export function UrlInput({
       </div>
 
       <p className="legal-note">
-        Télécharge uniquement les contenus que tu as le droit de télécharger.
+        Alice n'attend que toi pour commencer ton voyage.
       </p>
     </section>
   );

@@ -2,6 +2,7 @@ pub mod commands;
 pub mod folders;
 pub mod history;
 pub mod models;
+pub mod settings;
 pub mod ytdlp;
 
 use std::sync::{atomic::AtomicBool, Arc};

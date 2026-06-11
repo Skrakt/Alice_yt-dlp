@@ -1,6 +1,19 @@
 import { formatDate } from "../lib/format";
 import type { HistoryEntry, SavedFolder } from "../lib/types";
 
+function formatHistoryStatus(status: HistoryEntry["status"]) {
+  switch (status) {
+    case "success":
+      return "succès";
+    case "cancelled":
+      return "annulé";
+    case "error":
+      return "erreur";
+    default:
+      return status;
+  }
+}
+
 interface LibrarySidebarProps {
   savedFolders: SavedFolder[];
   history: HistoryEntry[];
@@ -35,8 +48,8 @@ export function LibrarySidebar({
           type="button"
           className="sidebar-toggle"
           onClick={onToggle}
-          aria-label={isOpen ? "Replier la barre laterale" : "Deplier la barre laterale"}
-          title={isOpen ? "Replier" : "Deplier"}
+          aria-label={isOpen ? "Replier la barre latérale" : "Déplier la barre latérale"}
+          title={isOpen ? "Replier" : "Déplier"}
         >
           {isOpen ? "<" : ">"}
         </button>
@@ -55,7 +68,7 @@ export function LibrarySidebar({
         <>
           <div className="sidebar-header">
             <div>
-              <p className="eyebrow">Bibliotheque locale</p>
+              <p className="eyebrow">Bibliothèque locale</p>
               <h2>Dossiers favoris</h2>
             </div>
             <button onClick={onAddFolder}>Ajouter</button>
@@ -63,7 +76,7 @@ export function LibrarySidebar({
 
           {savedFolders.length === 0 ? (
             <p className="empty-state">
-              Ajoute un dossier pour naviguer dans tes medias locaux depuis Alice.
+              Ajoute un dossier pour naviguer dans tes médias locaux depuis Alice.
             </p>
           ) : (
             <div className="sidebar-folder-list">
@@ -78,7 +91,6 @@ export function LibrarySidebar({
                   onClick={() => onOpenFolder(folder.path)}
                 >
                   <strong className="truncate-line">{folder.name}</strong>
-                  <span className="truncate-line">{folder.path}</span>
                 </button>
               ))}
             </div>
@@ -103,7 +115,7 @@ export function LibrarySidebar({
                         {entry.format.toUpperCase()}
                       </strong>
                       <span className={`status-chip ${entry.status}`}>
-                        {entry.status}
+                        {formatHistoryStatus(entry.status)}
                       </span>
                     </div>
                     <p className="truncate-line">{entry.source_url}</p>

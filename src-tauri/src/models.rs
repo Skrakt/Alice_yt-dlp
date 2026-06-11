@@ -87,3 +87,14 @@ pub struct SavedFolder {
     pub path: String,
     pub name: String,
 }
+
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct AppSettings {
+    pub sidebar_open: bool,
+}
+
+impl Default for AppSettings {
+    fn default() -> Self {
+        Self { sidebar_open: true }
+    }
+}

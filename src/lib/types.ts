@@ -87,3 +87,7 @@ export interface SavedFolder {
   path: string;
   name: string;
 }
+
+export interface AppSettings {
+  sidebar_open: boolean;
+}

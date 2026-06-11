@@ -1,22 +1,22 @@
 const TEMPLATE_OPTIONS = [
   {
-    label: "Numero + titre",
-    description: "Exemple: 001 - Ma video.mp3",
+    label: "Numéro + titre",
+    description: "Exemple : 001 - Ma vidéo.mp3",
     value: "%(playlist_index)03d - %(title)s.%(ext)s",
   },
   {
     label: "Titre seul",
-    description: "Exemple: Ma video.mp3",
+    description: "Exemple : Ma vidéo.mp3",
     value: "%(title)s.%(ext)s",
   },
   {
     label: "Auteur + titre",
-    description: "Exemple: Mon artiste - Ma video.mp3",
+    description: "Exemple : Mon artiste - Ma vidéo.mp3",
     value: "%(uploader)s - %(title)s.%(ext)s",
   },
   {
     label: "Date + titre",
-    description: "Exemple: 20240115 - Ma video.mp3",
+    description: "Exemple : 20240115 - Ma vidéo.mp3",
     value: "%(upload_date)s - %(title)s.%(ext)s",
   },
 ] as const;
@@ -60,7 +60,7 @@ export function DownloadOptions({
         <div className="template-selector-header">
           <span>Nom des fichiers</span>
           <small>
-            Choisis la facon dont Alice nomme les fichiers telecharges.
+            Choisis la façon dont Alice nomme les fichiers téléchargés.
           </small>
         </div>
         <div className="template-option-grid">
@@ -82,7 +82,7 @@ export function DownloadOptions({
         </div>
         {selectedTemplate === "custom" ? (
           <div className="template-custom-note">
-            Mode personnalise actif: le modele actuel sera conserve.
+            Mode personnalisé actif : le modèle actuel sera conservé.
           </div>
         ) : null}
       </div>

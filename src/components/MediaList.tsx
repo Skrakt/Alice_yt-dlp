@@ -1,6 +1,23 @@
 import { cn, formatDuration } from "../lib/format";
 import type { MediaItem } from "../lib/types";
 
+function formatMediaStatus(status: MediaItem["status"]) {
+  switch (status) {
+    case "pending":
+      return "en attente";
+    case "downloading":
+      return "téléchargement";
+    case "done":
+      return "terminé";
+    case "error":
+      return "erreur";
+    case "skipped":
+      return "ignoré";
+    default:
+      return status;
+  }
+}
+
 interface MediaListProps {
   items: MediaItem[];
   onToggle: (id: string) => void;
@@ -47,7 +64,7 @@ export function MediaList({ items, onToggle, onToggleAll }: MediaListProps) {
                       {String(item.playlist_index).padStart(3, "0")} · {item.title}
                     </strong>
                     <span className={cn("status-chip", item.status)}>
-                      {item.status}
+                      {formatMediaStatus(item.status)}
                     </span>
                   </div>
                   <p>{item.uploader || "Auteur inconnu"}</p>

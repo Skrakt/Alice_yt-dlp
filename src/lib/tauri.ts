@@ -1,6 +1,7 @@
 import { invoke } from "@tauri-apps/api/core";
 import { listen, type UnlistenFn } from "@tauri-apps/api/event";
 import type {
+  AppSettings,
   DependencyStatus,
   DownloadRequest,
   DownloadProgressEvent,
@@ -56,6 +57,14 @@ export function getSavedFolders(): Promise<SavedFolder[]> {
 
 export function saveSavedFolders(folders: SavedFolder[]): Promise<void> {
   return invoke("save_saved_folders", { folders });
+}
+
+export function getSettings(): Promise<AppSettings> {
+  return invoke("get_settings");
+}
+
+export function saveSettings(settings: AppSettings): Promise<void> {
+  return invoke("save_settings", { settings });
 }
 
 export async function onProgress(

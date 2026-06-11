@@ -9,10 +9,12 @@ import {
   ensureDependencies,
   getHistory,
   getSavedFolders,
+  getSettings,
   listDirectory,
   onLog,
   onProgress,
   saveSavedFolders,
+  saveSettings,
   startDownload,
 } from "./lib/tauri";
 import type {
@@ -37,7 +39,6 @@ import { ProgressPanel } from "./components/ProgressPanel";
 import { UrlInput } from "./components/UrlInput";
 
 const DEFAULT_TEMPLATE = "%(playlist_index)03d - %(title)s.%(ext)s";
-const SIDEBAR_STATE_KEY = "alice.sidebar.open";
 
 function getFolderName(path: string): string {
   const trimmed = path.replace(/[\\/]+$/, "");
@@ -73,7 +74,7 @@ function App() {
   const [audioQuality, setAudioQuality] = useState("0");
   const [outputTemplate, setOutputTemplate] = useState(DEFAULT_TEMPLATE);
   const [totalProgress, setTotalProgress] = useState(0);
-  const [statusText, setStatusText] = useState("Pret.");
+  const [statusText, setStatusText] = useState("Prêt.");
   const [savedFolders, setSavedFolders] = useState<SavedFolder[]>([]);
   const [isSidebarOpen, setIsSidebarOpen] = useState(true);
   const [currentFolderPath, setCurrentFolderPath] = useState("");
@@ -85,16 +86,22 @@ function App() {
   useEffect(() => {
     document.title = "Alice";
 
-    const savedSidebarState = localStorage.getItem(SIDEBAR_STATE_KEY);
-    if (savedSidebarState !== null) {
-      setIsSidebarOpen(savedSidebarState === "true");
-    }
+    void getSettings()
+      .then((settings) => {
+        setIsSidebarOpen(settings.sidebar_open);
+      })
+      .catch((error) => {
+        setLogs((current) => [
+          `Impossible de charger les paramètres locaux : ${String(error)}`,
+          ...current,
+        ]);
+      });
 
     void getSavedFolders()
       .then(setSavedFolders)
       .catch((error) => {
         setLogs((current) => [
-          `Impossible de charger les dossiers favoris: ${String(error)}`,
+          `Impossible de charger les dossiers favoris : ${String(error)}`,
           ...current,
         ]);
       });
@@ -103,14 +110,14 @@ function App() {
       .then((status) => {
         if (status.issues.length > 0) {
           setLogs((current) => [
-            ...status.issues.map((issue) => `Dependances: ${issue}`),
+            ...status.issues.map((issue) => `Dépendances : ${issue}`),
             ...current,
           ]);
         }
       })
       .catch((error) => {
         setLogs((current) => [
-          `Impossible de verifier les dependances: ${String(error)}`,
+          `Impossible de vérifier les dépendances : ${String(error)}`,
           ...current,
         ]);
       });
@@ -168,7 +175,7 @@ function App() {
       })
       .catch((error) => {
         setLogs((current) => [
-          `Impossible d'ecouter la progression: ${String(error)}`,
+          `Impossible d'écouter la progression : ${String(error)}`,
           ...current,
         ]);
       });
@@ -183,7 +190,7 @@ function App() {
       })
       .catch((error) => {
         setLogs((current) => [
-          `Impossible d'ecouter les logs: ${String(error)}`,
+          `Impossible d'écouter les journaux : ${String(error)}`,
           ...current,
         ]);
       });
@@ -196,7 +203,12 @@ function App() {
   }, []);
 
   useEffect(() => {
-    localStorage.setItem(SIDEBAR_STATE_KEY, String(isSidebarOpen));
+    void saveSettings({ sidebar_open: isSidebarOpen }).catch((error) => {
+      setLogs((current) => [
+        `Impossible d'enregistrer les paramètres locaux : ${String(error)}`,
+        ...current,
+      ]);
+    });
   }, [isSidebarOpen]);
 
   async function refreshHistory() {
@@ -236,13 +248,13 @@ function App() {
     try {
       const media = await analyzeUrl(url);
       setItems(media);
-      setStatusText(`${media.length} media(s) detecte(s).`);
+      setStatusText(`${media.length} média(s) détecté(s).`);
     } catch (error) {
       const message = String(error);
       setStatusText(
-        message.includes("annul") ? "Analyse annulee." : "Analyse echouee.",
+        message.includes("annul") ? "Analyse annulée." : "Analyse échouée.",
       );
-      setLogs((current) => [`Erreur d'analyse: ${message}`, ...current]);
+      setLogs((current) => [`Erreur d'analyse : ${message}`, ...current]);
     } finally {
       setLoading(false);
     }
@@ -251,10 +263,10 @@ function App() {
   async function handleCancelAnalyze() {
     try {
       await cancelAnalysis();
-      setStatusText("Annulation de l'analyse demandee.");
+      setStatusText("Annulation de l'analyse demandée.");
     } catch (error) {
       setLogs((current) => [
-        `Impossible d'annuler l'analyse: ${String(error)}`,
+        `Impossible d'annuler l'analyse : ${String(error)}`,
         ...current,
       ]);
     }
@@ -264,7 +276,7 @@ function App() {
     setItems([]);
     setLogs([]);
     setTotalProgress(0);
-    setStatusText("Pret.");
+    setStatusText("Prêt.");
   }
 
   async function handleChooseOutputDirectory() {
@@ -301,7 +313,7 @@ function App() {
 
   async function handleDownload() {
     setIsDownloading(true);
-    setStatusText("Preparation du telechargement...");
+    setStatusText("Préparation du téléchargement...");
     setTotalProgress(0);
     setItems((current) =>
       current.map((item) =>
@@ -329,9 +341,9 @@ function App() {
       });
     } catch (error) {
       setIsDownloading(false);
-      setStatusText("Telechargement impossible.");
+      setStatusText("Téléchargement impossible.");
       setLogs((current) => [
-        `Erreur de telechargement: ${String(error)}`,
+        `Erreur de téléchargement : ${String(error)}`,
         ...current,
       ]);
     }
@@ -340,7 +352,7 @@ function App() {
   async function handleCancel() {
     await cancelDownload();
     setIsDownloading(false);
-    setStatusText("Annulation demandee.");
+    setStatusText("Annulation demandée.");
   }
 
   async function handleClearHistory() {
@@ -413,6 +425,12 @@ function App() {
                     statusText={statusText}
                   />
 
+                  <OutputDirectoryPicker
+                    outputDir={outputDir}
+                    onChoose={() => void handleChooseOutputDirectory()}
+                    onChange={setOutputDir}
+                  />
+
                   <DownloadModeSelector
                     mode={mode}
                     audioFormat={audioFormat}
@@ -429,12 +447,6 @@ function App() {
                     outputTemplate={outputTemplate}
                     onAudioQualityChange={setAudioQuality}
                     onOutputTemplateChange={setOutputTemplate}
-                  />
-
-                  <OutputDirectoryPicker
-                    outputDir={outputDir}
-                    onChoose={() => void handleChooseOutputDirectory()}
-                    onChange={setOutputDir}
                   />
 
                   <DownloadControls

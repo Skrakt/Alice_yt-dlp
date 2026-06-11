@@ -1,6 +1,19 @@
 import { formatDate } from "../lib/format";
 import type { HistoryEntry } from "../lib/types";
 
+function formatHistoryStatus(status: HistoryEntry["status"]) {
+  switch (status) {
+    case "success":
+      return "succès";
+    case "cancelled":
+      return "annulé";
+    case "error":
+      return "erreur";
+    default:
+      return status;
+  }
+}
+
 interface HistoryPanelProps {
   history: HistoryEntry[];
   onClear: () => void;
@@ -25,7 +38,7 @@ export function HistoryPanel({ history, onClear }: HistoryPanelProps) {
               <div className="history-topline">
                 <strong>{entry.format.toUpperCase()}</strong>
                 <span className={`status-chip ${entry.status}`}>
-                  {entry.status}
+                  {formatHistoryStatus(entry.status)}
                 </span>
               </div>
               <p>{entry.source_url}</p>

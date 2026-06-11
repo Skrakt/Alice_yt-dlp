@@ -106,12 +106,62 @@ pub fn analyze_url(
     let yt_dlp = resolve_binary("yt-dlp")
         .ok_or_else(|| "yt-dlp est requis pour analyser une URL.".to_string())?;
 
+    let playlist_attempt = run_analysis_command(
+        app,
+        state,
+        &yt_dlp,
+        &["--flat-playlist", "--dump-json", url],
+    )?;
+
+    let playlist_items = parse_media_items(&playlist_attempt.stdout_lines);
+    if !playlist_items.is_empty() {
+        return Ok(playlist_items);
+    }
+
+    let video_attempt = run_analysis_command(
+        app,
+        state,
+        &yt_dlp,
+        &["--dump-json", "--no-playlist", url],
+    )?;
+
+    let video_items = parse_media_items(&video_attempt.stdout_lines);
+    if !video_items.is_empty() {
+        return Ok(video_items);
+    }
+
+    if !playlist_attempt.stderr_lines.is_empty() {
+        return Err(format!(
+            "Analyse yt-dlp échouée: {}",
+            playlist_attempt.stderr_lines.join("\n")
+        ));
+    }
+
+    if !video_attempt.stderr_lines.is_empty() {
+        return Err(format!(
+            "Analyse yt-dlp échouée: {}",
+            video_attempt.stderr_lines.join("\n")
+        ));
+    }
+
+    Err("Aucun média exploitable n'a été détecté.".to_string())
+}
+
+struct AnalysisResult {
+    stdout_lines: Vec<String>,
+    stderr_lines: Vec<String>,
+}
+
+fn run_analysis_command(
+    app: &AppHandle,
+    state: &AnalysisState,
+    yt_dlp: &str,
+    args: &[&str],
+) -> Result<AnalysisResult, String> {
     state.cancel_flag.store(false, Ordering::SeqCst);
 
     let mut child = Command::new(yt_dlp)
-        .arg("--flat-playlist")
-        .arg("--dump-json")
-        .arg(url)
+        .args(args)
         .stdout(Stdio::piped())
         .stderr(Stdio::piped())
         .spawn()
@@ -228,6 +278,13 @@ pub fn analyze_url(
         ));
     }
 
+    Ok(AnalysisResult {
+        stdout_lines,
+        stderr_lines,
+    })
+}
+
+fn parse_media_items(stdout_lines: &[String]) -> Vec<MediaItem> {
     let mut items = Vec::new();
 
     for (position, line) in stdout_lines.iter().enumerate() {
@@ -247,11 +304,7 @@ pub fn analyze_url(
         }
     }
 
-    if items.is_empty() {
-        return Err("Aucun média exploitable n'a été détecté.".to_string());
-    }
-
-    Ok(items)
+    items
 }
 
 fn value_to_media_item(value: &Value, fallback_index: usize) -> Option<MediaItem> {

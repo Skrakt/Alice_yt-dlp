@@ -27,7 +27,9 @@ fn main() {
             commands::get_history,
             commands::clear_history,
             commands::get_saved_folders,
-            commands::save_saved_folders
+            commands::save_saved_folders,
+            commands::get_settings,
+            commands::save_settings
         ])
         .run(tauri::generate_context!())
         .expect("error while running tauri application");
